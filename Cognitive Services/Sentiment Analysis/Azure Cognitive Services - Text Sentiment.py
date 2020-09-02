@@ -6,41 +6,14 @@ from pprint import pprint
 
 # COMMAND ----------
 
-# DBTITLE 1,Params
-#Set Parameters
-dbutils.widgets.removeAll()
-
-ColumnName = dbutils.widgets.text("ColumnName","Comments")
-
-#Get Parameters
-ColumnName = dbutils.widgets.get("ColumnName")
-
-#Print Date Range
-print("ColumnName = {}".format(ColumnName))
-
-# COMMAND ----------
-
-# DBTITLE 1,Cognitive Services API - Config
-key_var_name = '62bc476518ee45f9ada3510cdc5abef3'
-subscription_key = key_var_name
-
-endpoint_var_name = 'https://companyname-projectname-dev-textanalytics.cognitiveservices.azure.com'
-endpoint = endpoint_var_name
-
-language_api_url = endpoint + "/text/analytics/v3.0/Sentiment"
-language_api_url
-
-# COMMAND ----------
-
 # DBTITLE 1,Import Dataframe
 # File location and type
-file_location = "/FileStore/tables/SentimentAnalysis.csv"
-
+file_location = "/FileStore/tables/TwitterCovidTweets.csv"
 file_type = "csv"
 
 # CSV options
 infer_schema = "false"
-first_row_is_header = "true"
+first_row_is_header = "True"
 delimiter = ","
 
 # The applied options are for CSV files. For other file types, these will be ignored.
@@ -54,12 +27,37 @@ display(df)
 
 # COMMAND ----------
 
+# DBTITLE 1,Params
+#Set Parameters
+dbutils.widgets.removeAll()
+
+ColumnName = dbutils.widgets.text("ColumnName","")
+
+#Get Parameters
+ColumnName = dbutils.widgets.get("ColumnName")
+
+#Print Date Range
+print("ColumnName = {}".format(ColumnName))
+
+# COMMAND ----------
+
+# DBTITLE 1,Cognitive Services API - Config
+endpoint = 'https://company-name-textanalytics.cognitiveservices.azure.com/text/analytics/v3.0/Sentiment'
+
+subscription_key = 'c570a1c3f6784ceb9b9fcdfa8d6d317e'
+
+# COMMAND ----------
+
 # DBTITLE 1,Add Unique ID, Friendly Columns
+#Create Select List
+selectCols = ["ID"]
+selectCols.append(ColumnName)
+
 #Add Unique ID
-df = df.withColumn("id", monotonically_increasing_id())
+df = df.withColumn("ID", monotonically_increasing_id())
 dfCog = df.filter(col(ColumnName).isNotNull())
-dfCog = dfCog.selectExpr("id as ID", "Comments as Text").limit(10)
-display(dfCog.limit(10))
+dfCog = dfCog.selectExpr(selectCols)
+display(dfCog)
 
 # COMMAND ----------
 
@@ -74,7 +72,7 @@ pprint(document)
 
 # DBTITLE 1,Congnitive Services - Send Request
 headers = {"Ocp-Apim-Subscription-Key": subscription_key}
-response = requests.post(language_api_url, headers=headers, json=document)
+response = requests.post(endpoint, headers=headers, json=document)
 response = response.json()
 response
 
@@ -82,26 +80,25 @@ response
 
 # DBTITLE 1,Parallelize Json
 dfCog = spark.read.json(sc.parallelize(response["documents"]), prefersDecimal=True, dateFormat="yyyy-MM-dd",timestampFormat="yyyy-MM-dd HH:mm:ss",multiLine=False)
-dfCog = dfCog.filter(col("_corrupt_record").isNull())
 display(dfCog)
 
 # COMMAND ----------
 
 # DBTITLE 1,Flatten Json
-dfCog = dfCog.select(col("id").alias("Id"), 
+dfCog = dfCog.select(col("id").alias("ID"), 
                      col("sentiment").alias("Sentiment"),
                      explode(array("confidenceScores.positive")).alias("Positive"),
                     col("confidenceScores.neutral").alias("Neutral"),
         col("confidenceScores.negative").alias("Negative")
                  )
 
-dfCog = dfCog.select("Id", "Sentiment", "Positive", "Neutral", "Negative")
+dfCog = dfCog.select("ID", "Sentiment", "Positive", "Neutral", "Negative")
 display(dfCog)
 
 # COMMAND ----------
 
 # DBTITLE 1,Join Original Dataset - Drop Mon Id Column
-dfFinal = df.join(dfCog, df.id == dfCog.Id, how="left").drop('Id')
+dfFinal = df.join(dfCog, df.ID == dfCog.ID, how="left").drop('ID')
 
 # COMMAND ----------
 
