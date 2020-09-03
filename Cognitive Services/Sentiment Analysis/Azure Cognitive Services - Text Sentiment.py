@@ -50,7 +50,7 @@ subscription_key = 'c570a1c3f6784ceb9b9fcdfa8d6d317e'
 
 # DBTITLE 1,Add Unique ID, Friendly Columns
 #Create Select List
-selectCols = ["ID"]
+selectCols = ["ID", "Language"]
 selectCols.append(ColumnName)
 
 #Add Unique ID
