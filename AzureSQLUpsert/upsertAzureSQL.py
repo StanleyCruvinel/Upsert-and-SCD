@@ -5,8 +5,8 @@ def upsertAzureSQL(df, azureSqlStagingTable, azureSqlTargetTable, lookupColumns,
     # 
     # Parameters:
     # df = Input dataframe
-    # azureSqlStagingTable = Azure Datawarehouse Table used to stage the input dataframe for merge/upsert operation
-    # azureSqlTargetTable = Azure Datawarehouse Target table where the dataframe is merged/upserted
+    # azureSqlStagingTable = Azure SQL Table used to stage the input dataframe for merge/upsert operation
+    # azureSqlTargetTable = Azure SQL Target table where the dataframe is merged/upserted
     # lookupColumns = pipe separated columns that uniquely defines a record in input dataframe
     # deltaName = Name of watermark column in input dataframe
     #
