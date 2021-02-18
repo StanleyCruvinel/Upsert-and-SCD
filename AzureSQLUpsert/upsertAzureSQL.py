@@ -88,12 +88,12 @@ def upsertAzureSQL(df, azureSqlStagingTable, azureSqlTargetTable, lookupColumns,
 
   #SQL JDBC String
   #Note: Please store this in Azure Key Vault when implementing in live environment
-  sqldwJDBC = "jdbc:sqlserver://rorytest-sql01.database.windows.net:1433;database=ETLControl;user=sqladmin@rorytest-sql01;password=Rosetta33@;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;"
+  sqlJDBC = "jdbc:sqlserver://rorytest-sql01.database.windows.net:1433;database=ETLControl;user=sqladmin@rorytest-sql01;password=Rosetta33@;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;"
 
   #Write to Staging Table
   #NOTE: To improve performance this can be changed to a truncate and append when the staging tables have already been created to improve performance
   df.write.mode("Overwrite")\
-  .jdbc(sqldwJDBC,\
+  .jdbc(sqlJDBC,\
         azureSqlStagingTable, \
         mode="Overwrite")
 
