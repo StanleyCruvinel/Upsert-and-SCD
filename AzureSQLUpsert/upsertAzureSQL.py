@@ -88,7 +88,7 @@ def upsertAzureSQL(df, azureSqlStagingTable, azureSqlTargetTable, lookupColumns,
 
   #SQL JDBC String
   #Note: Please store this in Azure Key Vault when implementing in live environment
-  sqlJDBC = "jdbc:sqlserver://rorytest-sql01.database.windows.net:1433;database=ETLControl;user=sqladmin@rorytest-sql01;password=Rosetta33@;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;"
+  sqlJDBC = "jdbc:sqlserver://<Enter Database Server Name>.database.windows.net:1433;database=<Enter Database Name>;user=<Enter SQL User Name>@<Enter Database Server Name>;password=<Enter Password>;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;"
 
   #Write to Staging Table
   #NOTE: To improve performance this can be changed to a truncate and append when the staging tables have already been created to improve performance
@@ -103,9 +103,9 @@ def upsertAzureSQL(df, azureSqlStagingTable, azureSqlTargetTable, lookupColumns,
   import pyodbc
   #Note: Please store these details in Azure Key Vault when implementing in live environment
   conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};'
-                       'SERVER=rorytest-sql01.database.windows.net;'
-                       'DATABASE=ETLControl;UID=sqladmin;'
-                       'PWD=Rosetta33@')
+                       'SERVER=<Enter Database Server Name>.database.windows.net;'
+                       'DATABASE=<Enter Datase Name>;UID=<Enter SQL User Name>;'
+                       'PWD=<Enter Password Here>')
   cursor = conn.cursor()
   conn.autocommit = True
   cursor.execute(finalStatement)
