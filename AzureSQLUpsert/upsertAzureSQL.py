@@ -5,8 +5,8 @@ def upsertAzureSQL(df, azureSqlStagingTable, azureSqlTargetTable, lookupColumns,
     # 
     # Parameters:
     # df = Input dataframe
-    # azureSqlStagingTable = Azure SQL Table used to stage the input dataframe for merge/upsert operation
-    # azureSqlTargetTable = Azure SQL Target table where the dataframe is merged/upserted
+    # azureSqlStagingTable = Azure Datawarehouse Table used to stage the input dataframe for merge/upsert operation
+    # azureSqlTargetTable = Azure Datawarehouse Target table where the dataframe is merged/upserted
     # lookupColumns = pipe separated columns that uniquely defines a record in input dataframe
     # deltaName = Name of watermark column in input dataframe
     #
@@ -88,14 +88,19 @@ def upsertAzureSQL(df, azureSqlStagingTable, azureSqlTargetTable, lookupColumns,
 
   #SQL JDBC String
   #Note: Please store this in Azure Key Vault when implementing in live environment
-  sqlJDBC = "jdbc:sqlserver://<Enter Database Server Name>.database.windows.net:1433;database=<Enter Database Name>;user=<Enter SQL User Name>@<Enter Database Server Name>;password=<Enter Password>;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;"
+  sqlJDBC = "jdbc:sqlserver://rorytest-sql01.database.windows.net:1433;database=ETLControl;user=sqladmin@rorytest-sql01;password=Rosetta33@;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;"
 
   #Write to Staging Table
-  #NOTE: To improve performance this can be changed to a truncate and append when the staging tables have already been created to improve performance
-  df.write.mode("Overwrite")\
-  .jdbc(sqlJDBC,\
-        azureSqlStagingTable, \
-        mode="Overwrite")
+  df.write \
+  .format("com.microsoft.sqlserver.jdbc.spark") \
+  .mode("overwrite") \
+  .option("truncate", "true") \
+  .option("url", "jdbc:sqlserver://rorytest-sql01.database.windows.net;databaseName=ETLControl;") \
+  .option("dbtable", azureSqlStagingTable) \
+  .option("user", "sqladmin") \
+  .option("password", "Rosetta33@") \
+  .option("schemaCheckEnabled", "false") \
+  .save()
 
 
   # Due to a limiation with the Azure SQL Spark connector not accepting pre or post
@@ -103,9 +108,9 @@ def upsertAzureSQL(df, azureSqlStagingTable, azureSqlTargetTable, lookupColumns,
   import pyodbc
   #Note: Please store these details in Azure Key Vault when implementing in live environment
   conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};'
-                       'SERVER=<Enter Database Server Name>.database.windows.net;'
-                       'DATABASE=<Enter Datase Name>;UID=<Enter SQL User Name>;'
-                       'PWD=<Enter Password Here>')
+                       'SERVER=rorytest-sql01.database.windows.net;'
+                       'DATABASE=ETLControl;UID=sqladmin;'
+                       'PWD=Rosetta33@')
   cursor = conn.cursor()
   conn.autocommit = True
   cursor.execute(finalStatement)
