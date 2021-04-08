@@ -10,6 +10,8 @@ def upsertAzureSQL(df, azureSqlStagingTable, azureSqlTargetTable, lookupColumns,
     # lookupColumns = pipe separated columns that uniquely defines a record in input dataframe
     # deltaName = Name of watermark column in input dataframe
     #
+    # Author: https://www.linkedin.com/in/rorymcmanus/
+    #
     # Returns:
     # None
     # ##########################################################################################################################
