@@ -14,6 +14,9 @@ def type2SCD(df, outputDWStagingTable,outputDWTable, dateParameters):
 # scd_end_timestamp_column = Name of the Output Column
 # scd_TimeStampFormat = Date Format of Input Date Column
 
+# Author: https://www.linkedin.com/in/rorymcmanus/
+# Blog: https://www.linkedin.com/company/Data-Mastery
+
 # Returns:
 # A dataframe is returned
 
