@@ -23,7 +23,7 @@ def upsertAzureSQL(df, azureSqlStagingTable, azureSqlTargetTable, lookupColumns,
   dfColumns = str(df.columns)
   dfColumns = (((dfColumns.replace("'", "")).replace("[","")).replace("]","")).replace(" ","")
 
-  #Create a MERGE SQL for SCD UPSERT
+  #Create a MERGE SQL for UPSERT
   mergeStatement = "MERGE " + azureSqlTargetTable + " as " + targetTableAlias +  " USING " + azureSqlStagingTable + " as " + stagingTableAlias + " ON ("
 
   #Generic Lookup Statement
